@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     分类业务逻辑实现类
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0=
  * @date : 2017/11/30
  */
 @Service
@@ -25,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
      * 保存/修改分类目录
      *
      * @param category 分类目录
-     * @return ategory
+     * @return Category
      */
     @Override
     public Category saveByCategory(Category category) {
@@ -48,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     /**
      * 查询所有分类目录
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Category> findAllCategories() {
@@ -70,14 +73,19 @@ public class CategoryServiceImpl implements CategoryService {
      * 根据分类目录路径查询，用于验证是否已经存在该路径
      *
      * @param cateUrl cateUrl
-     * @return category
+     * @return Category
      */
     @Override
     public Category findByCateUrl(String cateUrl) {
         return categoryRepository.findCategoryByCateUrl(cateUrl);
     }
 
-
+    /**
+     * 将分类字符串集合转化为Category泛型集合
+     *
+     * @param strings strings
+     * @return List
+     */
     @Override
     public List<Category> strListToCateList(List<String> strings) {
         if (null == strings) {

@@ -12,8 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     文章/页面业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 public interface PostService {
@@ -44,6 +47,13 @@ public interface PostService {
     Post updatePostStatus(Long postId, Integer status);
 
     /**
+     * 修改文章阅读量
+     *
+     * @param post post
+     */
+    void updatePostView(Post post);
+
+    /**
      * 批量修改摘要
      *
      * @param postSummary postSummary
@@ -55,7 +65,7 @@ public interface PostService {
      *
      * @param postType post or page
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     Page<Post> findAllPosts(String postType, Pageable pageable);
 
@@ -63,7 +73,7 @@ public interface PostService {
      * 获取文章列表 不分页
      *
      * @param postType post or page
-     * @return List<Post></>
+     * @return List
      */
     List<Post> findAllPosts(String postType);
 
@@ -72,26 +82,34 @@ public interface PostService {
      *
      * @param keyWord  keyword
      * @param pageable pageable
-     * @return list
+     * @return List
      */
     List<Post> searchPosts(String keyWord, Pageable pageable);
 
     /**
-     * 根据文章状态查询 分页
+     * 根据文章状态查询 分页，用于后台管理
      *
      * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable);
+
+    /**
+     * 根据文章状态查询 分页，首页分页
+     *
+     * @param pageable pageable
+     * @return Page
+     */
+    Page<Post> findPostByStatus(Pageable pageable);
 
     /**
      * 根据文章状态查询
      *
      * @param status   0，1，2
      * @param postType post or page
-     * @return List<Post></>
+     * @return List
      */
     List<Post> findPostByStatus(Integer status, String postType);
 
@@ -102,6 +120,15 @@ public interface PostService {
      * @return Post
      */
     Optional<Post> findByPostId(Long postId);
+
+    /**
+     * 根据编号和类型查询文章
+     *
+     * @param postId   postId
+     * @param postType postType
+     * @return Post
+     */
+    Post findByPostId(Long postId, String postType);
 
     /**
      * 根据文章路径查询
@@ -123,7 +150,7 @@ public interface PostService {
      * 查询Id之后的文章
      *
      * @param postDate postDate
-     * @return post
+     * @return List
      */
     List<Post> findByPostDateAfter(Date postDate);
 
@@ -131,7 +158,7 @@ public interface PostService {
      * 查询Id之前的文章
      *
      * @param postDate postDate
-     * @return list
+     * @return List
      */
     List<Post> findByPostDateBefore(Date postDate);
 
@@ -145,7 +172,7 @@ public interface PostService {
     /**
      * 查询归档信息 根据年份
      *
-     * @return list
+     * @return List
      */
     List<Archive> findPostGroupByYear();
 
@@ -154,7 +181,7 @@ public interface PostService {
      *
      * @param year  year
      * @param month month
-     * @return list
+     * @return List
      */
     List<Post> findPostByYearAndMonth(String year, String month);
 
@@ -164,7 +191,7 @@ public interface PostService {
      * @param year     year
      * @param month    month
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable);
 
@@ -172,7 +199,7 @@ public interface PostService {
      * 根据年份查询文章
      *
      * @param year year
-     * @return list
+     * @return List
      */
     List<Post> findPostByYear(String year);
 
@@ -181,33 +208,63 @@ public interface PostService {
      *
      * @param category category
      * @param pageable pageable
-     * @return Page<Post></>
+     * @return Page
      */
-    Page<Post> findPostByCategories(Category category,Pageable pageable);
+    Page<Post> findPostByCategories(Category category, Pageable pageable);
 
     /**
      * 根据标签查询文章
      *
      * @param tag      tag
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Post> findPostsByTags(Tag tag, Pageable pageable);
 
     /**
      * 搜索文章
      *
-     * @param keyword 关键词
+     * @param keyword  关键词
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
-    Page<Post> searchByKeywords(String keyword,Pageable pageable);
+    Page<Post> searchByKeywords(String keyword, Pageable pageable);
+
+    /**
+     * 热门文章
+     *
+     * @return List
+     */
+    List<Post> hotPosts();
+
+    /**
+     * 当前文章的相似文章
+     *
+     * @param post post
+     * @return List
+     */
+    List<Post> relatedPosts(Post post);
+
+    /**
+     * 获取所有文章的阅读量
+     *
+     * @return Long
+     */
+    Long getPostViews();
+
+    /**
+     * 根据文章状态查询数量
+     *
+     * @param status 文章状态
+     * @return 文章数量
+     */
+    Integer getCountByStatus(Integer status);
 
     /**
      * 生成rss
      *
      * @param posts posts
-     * @return string
+     * @return String
      */
     String buildRss(List<Post> posts);
 
@@ -215,7 +272,7 @@ public interface PostService {
      * 生成sitemap
      *
      * @param posts posts
-     * @return string
+     * @return String
      */
     String buildSiteMap(List<Post> posts);
 }

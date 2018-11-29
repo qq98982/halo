@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     分类业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/30
  */
 public interface CategoryService {
@@ -51,5 +54,11 @@ public interface CategoryService {
      */
     Category findByCateUrl(String cateUrl);
 
+    /**
+     * 将分类字符串集合转化为Category泛型集合
+     *
+     * @param strings strings
+     * @return List
+     */
     List<Category> strListToCateList(List<String> strings);
 }

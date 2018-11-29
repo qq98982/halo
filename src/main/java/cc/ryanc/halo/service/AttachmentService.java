@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     附件业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/10
  */
 public interface AttachmentService {
@@ -25,7 +28,7 @@ public interface AttachmentService {
     /**
      * 查询所有附件信息
      *
-     * @return list
+     * @return List
      */
     List<Attachment> findAllAttachments();
 
@@ -33,7 +36,7 @@ public interface AttachmentService {
      * 查询所有附件，分页
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Attachment> findAllAttachments(Pageable pageable);
 

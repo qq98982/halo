@@ -9,13 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * <pre>
+ *     后台登录控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/13
- * @version : 1.0
- * description: 登录拦截器
  */
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Object obj = request.getSession().getAttribute(HaloConst.USER_SESSION_KEY);

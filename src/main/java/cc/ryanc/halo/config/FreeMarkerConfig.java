@@ -12,8 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 /**
+ * <pre>
+ *     FreeMarker配置
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Slf4j
@@ -37,13 +40,14 @@ public class FreeMarkerConfig {
 
     @PostConstruct
     public void setSharedVariable() {
-        configuration.setSharedVariable("commonTag", commonTagDirective);
-        configuration.setSharedVariable("articleTag", articleTagDirective);
         try {
+            //自定义标签
+            configuration.setSharedVariable("commonTag", commonTagDirective);
+            configuration.setSharedVariable("articleTag", articleTagDirective);
             configuration.setSharedVariable("options", optionsService.findAllOptions());
             configuration.setSharedVariable("user", userService.findUser());
         } catch (TemplateModelException e) {
-            e.printStackTrace();
+            log.error("Custom tags failed to load：{}", e.getMessage());
         }
     }
 }

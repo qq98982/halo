@@ -1,4 +1,5 @@
 <#macro head title="" keywords="" description="">
+<#import "/common/macro/common_macro.ftl" as common>
 <head>
     <meta charset="utf-8">
     <!--
@@ -55,7 +56,24 @@
     <!-- Import CSS -->
     <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/material/source/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
     <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/material/source/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
-
+    <style id="prettify_css"></style>
+    <script>
+        void 0 === window.lsLoadCSSMaxNums && (window.lsLoadCSSMaxNums = 0), window.lsLoadCSSMaxNums++, lsloader.load(
+                "prettify_css", "/material/source/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",
+                function () {
+                    void 0 === window.lsLoadCSSNums && (window.lsLoadCSSNums = 0), ++window.lsLoadCSSNums == window.lsLoadCSSMaxNums &&
+                    (document.documentElement.style.display = "")
+                }, !1)
+    </script>
+    <style id="prettify_theme"></style>
+    <script>
+        void 0 === window.lsLoadCSSMaxNums && (window.lsLoadCSSMaxNums = 0), window.lsLoadCSSMaxNums++, lsloader.load(
+                "prettify_theme", "/material/source/css/prettify/github-v2.min.css?AfzKxt++K+/lhZBlSjnxwg==",
+                function () {
+                    void 0 === window.lsLoadCSSNums && (window.lsLoadCSSNums = 0), ++window.lsLoadCSSNums == window.lsLoadCSSMaxNums &&
+                    (document.documentElement.style.display = "")
+                }, !1)
+    </script>
     <#if options.theme_material_scheme?default('Paradox') == "Isolation">
         <link rel="stylesheet" href="/material/source/css/fontawesome.min.css">
     </#if>
@@ -77,8 +95,7 @@
 
     <!-- Site Verification -->
 
-    <meta name="google-site-verification" content="${options.theme_material_google_site_verification?if_exists}" />
-    <meta name="baidu-site-verification" content="${options.theme_material_baidu_site_verification?if_exists}" />
+    <@common.verification />
 
     <!-- RSS -->
     <link rel=alternate type="application/atom+xml" href="/atom.xml">

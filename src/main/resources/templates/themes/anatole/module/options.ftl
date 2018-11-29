@@ -1,23 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-    <style>
-        .themeSetting,.themeImg{
-            padding-top: 15px;
-            padding-bottom: 15px;
-        }
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
+<#import "/common/macro/theme_option_marco.ftl" as option>
+<@option.head />
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6 themeImg">
@@ -117,12 +99,12 @@
                         <form method="post" class="form-horizontal" id="anatoleStyleOptions">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label for="anatoleStyleFavicon" class="col-sm-4 control-label">Favicon：</label>
+                                    <label for="anatoleStyleRightIcon" class="col-sm-4 control-label">右上角图标：</label>
                                     <div class="col-sm-8">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" id="anatoleStyleFavicon" name="anatole_style_favicon" value="${options.anatole_style_favicon?default("/anatole/source/images/favicon.png")}" >
+                                            <input type="text" class="form-control" id="anatoleStyleRightIcon" name="anatole_style_right_icon" value="${options.anatole_style_right_icon?default("/anatole/source/images/logo.png")}" >
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('anatoleStyleFavicon')">选择</button>
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('anatoleStyleRightIcon')">选择</button>
                                             </span>
                                         </div>
                                     </div>
@@ -135,6 +117,17 @@
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="anatole_style_post_title_lower" id="anatoleStylePostTitleLower" value="false" ${((options.anatole_style_post_title_lower?if_exists)=='false')?string('checked','')}> 关闭
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleBlogTitleLower" class="col-sm-4 control-label">博客标题大写：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_blog_title_lower" id="anatoleStyleBlogTitleLower" value="true" ${((options.anatole_style_blog_title_lower?default('true'))=='true')?string('checked','')}> 开启
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_blog_title_lower" id="anatoleStyleBlogTitleLower" value="false" ${((options.anatole_style_blog_title_lower?if_exists)=='false')?string('checked','')}> 关闭
                                         </label>
                                     </div>
                                 </div>
@@ -158,6 +151,24 @@
                                         <label class="radio-inline">
                                             <input type="radio" name="anatole_style_hitokoto" id="anatoleStyleHitokoto" value="false" ${((options.anatole_style_hitokoto?default('false'))=='false')?string('checked','')}> 关闭
                                         </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleGoogleColor" class="col-sm-4 control-label">浏览器沉浸颜色：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="anatoleStyleGoogleColor" name="anatole_style_google_color" value="${options.anatole_style_google_color?default("#fff")}" >
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleScrollbar" class="col-sm-4 control-label">全局滚动条颜色：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="anatoleStyleScrollbar" name="anatole_style_scrollbar" value="${options.anatole_style_scrollbar?default("#3798e8")}" >
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleSelf" class="col-sm-4 control-label">自定义样式：</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" rows="3" id="anatoleStyleSelf" name="anatole_style_self" style="resize: none">${options.anatole_style_self?if_exists}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -189,34 +200,4 @@
         </div>
     </div>
 </div>
-</body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/app.js"></script>
-<script>
-    function saveThemeOptions(option) {
-        var param = $('#'+option).serialize();
-        $.ajax({
-            type: 'post',
-            url: '/admin/option/save',
-            data: param,
-            success: function (data) {
-                showMsg("保存成功！","success",1000);
-            }
-        });
-    }
-    function openAttach(id) {
-        layer.open({
-            type: 2,
-            title: '所有附件',
-            shadeClose: true,
-            shade: 0.5,
-            area: ['90%', '90%'],
-            content: '/admin/attachments/select?id='+id,
-            scrollbar: false
-        });
-    }
-</script>
-</html>
+<@option.import_js />

@@ -5,15 +5,24 @@ import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.UserService;
-import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.model.enums.CommonParamsEnum;
+import cc.ryanc.halo.model.enums.ResponseStatusEnum;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
+import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,14 +36,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Random;
 
 /**
+ * <pre>
+ *     后台首页控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/5
- * @version : 1.0
- * description: 后台首页控制器
  */
 @Slf4j
 @Controller
@@ -56,6 +66,12 @@ public class AdminController extends BaseController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
+
     /**
      * 请求后台页面
      *
@@ -64,10 +80,7 @@ public class AdminController extends BaseController {
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
-    public String index(Model model, HttpSession session) {
-        //查询文章条数
-        Integer postCount = postService.findAllPosts(HaloConst.POST_TYPE_POST).size();
-        model.addAttribute("postCount", postCount);
+    public String index(Model model) {
 
         //查询评论的条数
         Integer commentCount = commentService.findAllComments().size();
@@ -85,7 +98,12 @@ public class AdminController extends BaseController {
         List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments", comments);
 
-        model.addAttribute("mediaCount", HaloConst.ATTACHMENTS.size());
+        //附件数量
+        model.addAttribute("mediaCount", attachmentService.findAllAttachments().size());
+
+        //文章阅读总数
+        Long postViewsSum = postService.getPostViews();
+        model.addAttribute("postViewsSum", postViewsSum);
         return "admin/admin_index";
     }
 
@@ -111,47 +129,58 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     * @return String 登录状态
+     * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
-    public String getLogin(@ModelAttribute("loginName") String loginName,
-                           @ModelAttribute("loginPwd") String loginPwd,
-                           HttpSession session) {
-        String status = "false";
-        try {
-            User aUser = userService.findUser();
-            User user = null;
-            if (StringUtils.equals(aUser.getLoginEnable(), "false")) {
-                status = "disable";
-            } else {
-                //验证是否是邮箱登录
-                Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-                Matcher matcher = patternEmail.matcher(loginName);
-                if (matcher.find()) {
-                    user = userService.userLoginByEmail(loginName, HaloUtils.getMD5(loginPwd)).get(0);
-                } else {
-                    user = userService.userLoginByName(loginName, HaloUtils.getMD5(loginPwd)).get(0);
-                }
-                if (aUser == user) {
-                    session.setAttribute(HaloConst.USER_SESSION_KEY, user);
-                    //重置用户的登录状态为正常
-                    userService.updateUserNormal();
-                    userService.updateUserLoginLast(new Date());
-                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), new Date()));
-                    status = "true";
-                }
-            }
-        } catch (Exception e) {
-            Integer errorCount = userService.updateUserLoginError();
-            if (errorCount >= 5) {
-                userService.updateUserLoginEnable("false");
-            }
-            userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + loginName + "," + loginPwd + "]", HaloUtils.getIpAddr(request), new Date()));
-            log.error("登录失败！：{0}", e.getMessage());
+    public JsonResult getLogin(@ModelAttribute("loginName") String loginName,
+                               @ModelAttribute("loginPwd") String loginPwd,
+                               HttpSession session) {
+        //已注册账号，单用户，只有一个
+        User aUser = userService.findUser();
+        //首先判断是否已经被禁用已经是否已经过了10分钟
+        Date loginLast = DateUtil.date();
+        if (null != aUser.getLoginLast()) {
+            loginLast = aUser.getLoginLast();
         }
-        return status;
+        Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
+        if (StrUtil.equals(aUser.getLoginEnable(), TrueFalseEnum.FALSE.getDesc()) && (between < CommonParamsEnum.TEN.getValue())) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.disabled"));
+        }
+        //验证用户名和密码
+        User user = null;
+        if (Validator.isEmail(loginName)) {
+            user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd));
+        } else {
+            user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd));
+        }
+        userService.updateUserLoginLast(DateUtil.date());
+        //判断User对象是否相等
+        if (ObjectUtil.equal(aUser, user)) {
+            session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
+            //重置用户的登录状态为正常
+            userService.updateUserNormal();
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
+            log.info("User {} login succeeded.", aUser.getUserDisplayName());
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
+        } else {
+            //更新失败次数
+            Integer errorCount = userService.updateUserLoginError();
+            //超过五次禁用账户
+            if (errorCount >= CommonParamsEnum.FIVE.getValue()) {
+                userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
+            }
+            logsService.saveByLogs(
+                    new Logs(
+                            LogsRecord.LOGIN,
+                            LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]",
+                            ServletUtil.getClientIP(request),
+                            DateUtil.date()
+                    )
+            );
+            Object[] args = {(5 - errorCount)};
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
+        }
     }
 
     /**
@@ -163,9 +192,9 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtils.getIpAddr(request), new Date()));
-        session.invalidate();
-        log.info("用户[" + user.getUserName() + "]退出登录");
+        session.removeAttribute(HaloConst.USER_SESSION_KEY);
+        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
+        log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
     }
 
@@ -198,7 +227,7 @@ public class AdminController extends BaseController {
         try {
             logsService.removeAllLogs();
         } catch (Exception e) {
-            log.error("未知错误：" + e.getMessage());
+            log.error("Clear log failed:{}" + e.getMessage());
         }
         return "redirect:/admin";
     }
@@ -211,5 +240,17 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/halo")
     public String halo() {
         return "admin/admin_halo";
+    }
+
+    /**
+     * 获取一个Token
+     *
+     * @return JsonResult
+     */
+    @GetMapping(value = "/getToken")
+    @ResponseBody
+    public JsonResult getToken() {
+        String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
     }
 }

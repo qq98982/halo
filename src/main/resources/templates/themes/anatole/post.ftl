@@ -1,11 +1,36 @@
 <#include "module/macro.ftl">
-<@head title="${post.postTitle} · ${options.blog_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')}" description="${post.postSummary?if_exists}"></@head>
+<@head title="${post.postTitle} · ${options.blog_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')},${tagWords}" description="${post.postSummary?if_exists}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <link href="/anatole/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
     <style>
         code, tt {
             font-size: 1.2em;
+        }
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: block;
+            width: 100%;
+            overflow: auto;
+
+        }
+        table th {
+            font-weight: 600;
+        }
+        table th,
+        table td {
+            padding: 6px 13px;
+            border: 1px solid #dfe2e5;
+        }
+        table tr {
+            background-color: #fff;
+            border-top: 1px solid #c6cbd1;
+        }
+        table tr:nth-child(2n) {
+            background-color: #f6f8fa;
         }
     </style>
     <#include "module/page-top.ftl">
@@ -19,7 +44,7 @@
                         </h3>
                     </div>
                     <div class="post-content">
-                        ${post.postContent}
+                        ${post.postContent?if_exists}
                     </div>
                     <div class="post-footer">
                         <div class="meta">
@@ -38,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="share">
+                <div class="share" style="display: inline-flex">
                     <div class="evernote">
                         <a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();"
                            ref="nofollow" target="_blank" class="fa fa-bookmark"></a>

@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     菜单业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/24
  */
 public interface MenuService {
@@ -23,7 +26,7 @@ public interface MenuService {
     /**
      * 查询所有菜单
      *
-     * @return list
+     * @return List
      */
     List<Menu> findAllMenus();
 
@@ -31,7 +34,7 @@ public interface MenuService {
      * 删除菜单
      *
      * @param menuId menuId
-     * @return menu
+     * @return Menu
      */
     Menu removeByMenuId(Long menuId);
 
@@ -39,7 +42,7 @@ public interface MenuService {
      * 根据编号查询菜单
      *
      * @param menuId menuId
-     * @return Menu
+     * @return Optional
      */
     Optional<Menu> findByMenuId(Long menuId);
 }

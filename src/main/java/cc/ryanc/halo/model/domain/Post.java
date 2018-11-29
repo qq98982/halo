@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -10,8 +11,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章／页面
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 @Data
@@ -92,7 +96,6 @@ public class Post implements Serializable {
      * 文章的评论
      */
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 
     /**
@@ -116,4 +119,29 @@ public class Post implements Serializable {
      * 2 回收站
      */
     private Integer postStatus = 0;
+
+    /**
+     * 文章访问量
+     */
+    private Long postViews = 0L;
+
+    /**
+     * 是否允许评论
+     */
+    private Integer allowComment = 0;
+
+    /**
+     * 指定渲染模板
+     */
+    private String customTpl;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getPostDate() {
+        return postDate;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getPostUpdate() {
+        return postUpdate;
+    }
 }

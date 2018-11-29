@@ -1,21 +1,25 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Category;
+import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.CategoryService;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     后台分类管理控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/10
- * @version : 1.0
- * description : 分类目录控制器
  */
 @Slf4j
 @Controller
@@ -24,6 +28,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 查询所有分类并渲染category页面
@@ -43,10 +50,11 @@ public class CategoryController {
      */
     @PostMapping(value = "/save")
     public String saveCategory(@ModelAttribute Category category) {
+
         try {
             categoryService.saveByCategory(category);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("Modify category failed: {}", e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -55,13 +63,16 @@ public class CategoryController {
      * 验证分类目录路径是否已经存在
      *
      * @param cateUrl 分类路径
-     * @return true：不存在，false：存在
+     * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public boolean checkCateUrlExists(@RequestParam("cateUrl") String cateUrl) {
+    public JsonResult checkCateUrlExists(@RequestParam("cateUrl") String cateUrl) {
         Category category = categoryService.findByCateUrl(cateUrl);
-        return null != category;
+        if (null != category) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+        }
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }
 
     /**
@@ -71,12 +82,11 @@ public class CategoryController {
      * @return 重定向到/admin/category
      */
     @GetMapping(value = "/remove")
-    public String removeCategory(@PathParam("cateId") Long cateId) {
+    public String removeCategory(@RequestParam("cateId") Long cateId) {
         try {
-            Category category = categoryService.removeByCateId(cateId);
-            log.info("删除的分类目录：" + category);
+            categoryService.removeByCateId(cateId);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("Delete category failed: {}", e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -89,7 +99,7 @@ public class CategoryController {
      * @return 模板路径admin/admin_category
      */
     @GetMapping(value = "/edit")
-    public String toEditCategory(Model model, @PathParam("cateId") Long cateId) {
+    public String toEditCategory(Model model, @RequestParam("cateId") Long cateId) {
         Optional<Category> category = categoryService.findByCateId(cateId);
         model.addAttribute("updateCategory", category.get());
         return "admin/admin_category";

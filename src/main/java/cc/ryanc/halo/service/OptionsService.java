@@ -5,8 +5,11 @@ import cc.ryanc.halo.model.domain.Options;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     系统设置业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 public interface OptionsService {
@@ -36,7 +39,7 @@ public interface OptionsService {
     /**
      * 获取所有设置选项
      *
-     * @return map
+     * @return Map
      */
     Map<String, String> findAllOptions();
 

@@ -1,24 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/plugins/colorpicker/css/bootstrap-colorpicker.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-    <style>
-        .themeSetting,.themeImg{
-            padding-top: 15px;
-            padding-bottom: 15px;
-        }
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
+<#import "/common/macro/theme_option_marco.ftl" as option>
+<@option.head />
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6 themeImg">
@@ -130,18 +111,6 @@
                                     <label for="materialCopyrightSince" class="col-sm-4 control-label">站点成立时间：</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="materialCopyrightSince" name="theme_material_copyright_since" value="${options.theme_material_copyright_since?if_exists}" >
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="materialGoogleSiteVerification" class="col-sm-4 control-label">谷歌Search Console验证：</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialGoogleSiteVerification" name="theme_material_google_site_verification" value="${options.theme_material_google_site_verification?if_exists}" >
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="materialBaiduSiteVerification" class="col-sm-4 control-label">百度站长平台验证：</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialBaiduSiteVerification" name="theme_material_baidu_site_verification" value="${options.theme_material_baidu_site_verification?if_exists}" >
                                     </div>
                                 </div>
                             </div>
@@ -519,44 +488,4 @@
         </div>
     </div>
 </div>
-</body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/plugins/colorpicker/js/bootstrap-colorpicker.min.js"></script>
-<script src="/static/js/app.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#materialUiuxThemeColor').colorpicker();
-        $('#materialUiuxThemeSubColor').colorpicker();
-        $('#materialHyperLinkColor').colorpicker();
-        $('#materialButtonColor').colorpicker();
-        $('#materialGoogleColor').colorpicker();
-        $('#materialNprogressColor').colorpicker();
-        $('#materialBackgroundColor').colorpicker();
-    });
-    function saveThemeOptions(option) {
-        var param = $('#'+option).serialize();
-        $.ajax({
-            type: 'post',
-            url: '/admin/option/save',
-            data: param,
-            success: function (data) {
-                showMsg("保存成功！","success",1000);
-            }
-        });
-    }
-    function openAttach(id) {
-        layer.open({
-            type: 2,
-            title: '所有附件',
-            shadeClose: true,
-            shade: 0.5,
-            area: ['90%', '90%'],
-            content: '/admin/attachments/select?id='+id,
-            scrollbar: false
-        });
-    }
-</script>
-</html>
+<@option.import_js />

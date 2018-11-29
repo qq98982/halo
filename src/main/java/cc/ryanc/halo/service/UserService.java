@@ -3,11 +3,13 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.domain.User;
 
 import java.util.Date;
-import java.util.List;
 
 /**
+ * <pre>
+ *     用户业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 public interface UserService {
@@ -26,21 +28,21 @@ public interface UserService {
      * @param userPass userPass
      * @return User
      */
-    List<User> userLoginByName(String userName, String userPass);
+    User userLoginByName(String userName, String userPass);
 
     /**
      * 根据邮箱和密码查询，用户登录
      *
      * @param userEmail userEmail
      * @param userPass  userPass
-     * @return list
+     * @return User
      */
-    List<User> userLoginByEmail(String userEmail, String userPass);
+    User userLoginByEmail(String userEmail, String userPass);
 
     /**
      * 查询所有用户
      *
-     * @return list
+     * @return User
      */
     User findUser();
 
@@ -49,7 +51,7 @@ public interface UserService {
      *
      * @param userId   userid
      * @param userPass userpass
-     * @return user
+     * @return User
      */
     User findByUserIdAndUserPass(Long userId, String userPass);
 
@@ -63,19 +65,22 @@ public interface UserService {
     /**
      * 修改最后登录时间
      *
-     * @param lastDate lastDate
+     * @param lastDate 最后登录时间
+     * @return User
      */
     User updateUserLoginLast(Date lastDate);
 
     /**
      * 增加登录错误次数
      *
-     * @param error error
+     * @return 登录错误次数
      */
     Integer updateUserLoginError();
 
     /**
      * 修改用户的状态为正常
+     *
+     * @return User
      */
     User updateUserNormal();
 }

@@ -1,5 +1,7 @@
 package cc.ryanc.halo.model.tag;
 
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.*;
 import freemarker.core.Environment;
 import freemarker.template.*;
@@ -10,8 +12,11 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     FreeMarker自定义标签
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Component
@@ -47,10 +52,10 @@ public class CommonTagDirective implements TemplateDirectiveModel {
                     environment.setVariable("categories", builder.build().wrap(categoryService.findAllCategories()));
                     break;
                 case "tags":
-                    environment.setVariable("tags",builder.build().wrap(tagService.findAllTags()));
+                    environment.setVariable("tags", builder.build().wrap(tagService.findAllTags()));
                     break;
                 case "links":
-                    environment.setVariable("links",builder.build().wrap(linkService.findAllLinks()));
+                    environment.setVariable("links", builder.build().wrap(linkService.findAllLinks()));
                     break;
                 case "newComments":
                     environment.setVariable("newComments", builder.build().wrap(commentService.findAllComments(1)));

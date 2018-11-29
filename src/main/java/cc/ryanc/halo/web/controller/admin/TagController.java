@@ -1,20 +1,23 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.TagService;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-
 /**
+ * <pre>
+ *     后台标签管理控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/10
- * @version : 1.0
- * description: 标签控制器
  */
 @Slf4j
 @Controller
@@ -23,6 +26,9 @@ public class TagController {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 渲染标签管理页面
@@ -45,7 +51,7 @@ public class TagController {
         try {
             tagService.saveByTag(tag);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("Add/modify tag failed: {}", e.getMessage());
         }
         return "redirect:/admin/tag";
     }
@@ -58,9 +64,12 @@ public class TagController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public boolean checkTagUrlExists(@RequestParam("tagUrl") String tagUrl) {
+    public JsonResult checkTagUrlExists(@RequestParam("tagUrl") String tagUrl) {
         Tag tag = tagService.findByTagUrl(tagUrl);
-        return null != tag;
+        if (null != tag) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+        }
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }
 
     /**
@@ -70,12 +79,11 @@ public class TagController {
      * @return 重定向到/admin/tag
      */
     @GetMapping(value = "/remove")
-    public String removeTag(@PathParam("tagId") Long tagId) {
+    public String removeTag(@RequestParam("tagId") Long tagId) {
         try {
-            Tag tag = tagService.removeByTagId(tagId);
-            log.info("删除的标签：" + tag);
+            tagService.removeByTagId(tagId);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("Failed to delete tag: {}", e.getMessage());
         }
         return "redirect:/admin/tag";
     }
@@ -88,7 +96,7 @@ public class TagController {
      * @return 模板路径admin/admin_tag
      */
     @GetMapping(value = "/edit")
-    public String toEditTag(Model model, @PathParam("tagId") Long tagId) {
+    public String toEditTag(Model model, @RequestParam("tagId") Long tagId) {
         Tag tag = tagService.findByTagId(tagId).get();
         model.addAttribute("updateTag", tag);
         return "admin/admin_tag";

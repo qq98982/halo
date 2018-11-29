@@ -3,10 +3,12 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.web.controller.core.BaseController;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.PageUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,11 +20,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 /**
+ * <pre>
+ *     前台标签控制器
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Controller
@@ -50,7 +53,7 @@ public class FrontTagController extends BaseController {
      *
      * @param tagUrl 标签路径
      * @param model  model
-     * @return string
+     * @return String
      */
     @GetMapping(value = "{tagUrl}")
     public String tags(Model model,
@@ -64,21 +67,27 @@ public class FrontTagController extends BaseController {
      * @param model  model
      * @param tagUrl 标签路径
      * @param page   页码
-     * @return string
+     * @return String
      */
     @GetMapping(value = "{tagUrl}/page/{page}")
     public String tags(Model model,
                        @PathVariable("tagUrl") String tagUrl,
                        @PathVariable("page") Integer page) {
         Tag tag = tagService.findByTagUrl(tagUrl);
+        if(null==tag){
+            return this.renderNotFound();
+        }
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
-        if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
+        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        model.addAttribute("is_tags",true);
         model.addAttribute("posts", posts);
+        model.addAttribute("rainbow", rainbow);
         model.addAttribute("tag", tag);
         return this.render("tag");
     }

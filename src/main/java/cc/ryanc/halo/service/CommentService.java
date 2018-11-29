@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     评论业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/22
  */
 public interface CommentService {
@@ -26,7 +29,7 @@ public interface CommentService {
      * 删除评论
      *
      * @param commentId commentId
-     * @return comment
+     * @return Optional
      */
     Optional<Comment> removeByCommentId(Long commentId);
 
@@ -35,7 +38,7 @@ public interface CommentService {
      *
      * @param status   status
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Comment> findAllComments(Integer status, Pageable pageable);
 
@@ -43,14 +46,14 @@ public interface CommentService {
      * 根据评论状态查询评论
      *
      * @param status 评论状态
-     * @return list
+     * @return List
      */
     List<Comment> findAllComments(Integer status);
 
     /**
      * 查询所有评论，不分页
      *
-     * @return list
+     * @return List
      */
     List<Comment> findAllComments();
 
@@ -59,7 +62,7 @@ public interface CommentService {
      *
      * @param commentId commentId
      * @param status    status
-     * @return comment
+     * @return Comment
      */
     Comment updateCommentStatus(Long commentId, Integer status);
 
@@ -67,7 +70,7 @@ public interface CommentService {
      * 根据评论编号查询评论
      *
      * @param commentId commentId
-     * @return comment
+     * @return Optional
      */
     Optional<Comment> findCommentById(Long commentId);
 
@@ -76,24 +79,50 @@ public interface CommentService {
      *
      * @param post     post
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByPost(Post post, Pageable pageable);
 
     /**
-     * 根据文章和评论状态查询评论
+     * 根据文章和评论状态查询评论 分页
      *
      * @param post     post
      * @param pageable pageable
      * @param status   status
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status);
 
     /**
+     * 根据文章和评论状态查询评论 不分页
+     *
+     * @param post   post
+     * @param status status
+     * @return List
+     */
+    List<Comment> findCommentsByPostAndCommentStatus(Post post, Integer status);
+
+    /**
+     * 根据文章和评论状态（为不查询的）查询评论 不分页
+     *
+     * @param post   post
+     * @param status status
+     * @return List
+     */
+    List<Comment> findCommentsByPostAndCommentStatusNot(Post post, Integer status);
+
+    /**
      * 查询最新的前五条评论
      *
-     * @return list
+     * @return List
      */
     List<Comment> findCommentsLatest();
+
+    /**
+     * 根据评论状态查询数量
+     *
+     * @param status 评论状态
+     * @return 评论数量
+     */
+    Integer getCountByStatus(Integer status);
 }
